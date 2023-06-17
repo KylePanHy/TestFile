@@ -57,9 +57,9 @@ function CreateFile {
 
 echo "=========== license request start. =========="
 
-userToken=$HYENA.TOKEN
+userToken=$HYENA_TOKEN
 
-if [ -z $userToken ] ; then 
+if [ -z "$userToken" ] ; then 
 	echo "Please entry your token."
 	exit 1
 fi
