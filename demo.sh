@@ -1,6 +1,5 @@
 #! /bin/bash
 
-
 targetFile="token_validation_sh.json"
 
 targetPath="${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/${targetFile}"
@@ -58,7 +57,9 @@ function CreateFile {
 
 echo "=========== license request start. =========="
 
-if [ ! $# -eq 1 ] ; then 
+userToken=$HYENA.TOKEN
+
+if [ -z $userToken ] ; then 
 	echo "Please entry your token."
 	exit 1
 fi
@@ -67,7 +68,7 @@ CheckXcodeEnv
 
 CheckCmd
 
-getLicense=$(RequestLicense "$1")
+getLicense=$(RequestLicense "$userToken")
 
 CreateFile
 
