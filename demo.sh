@@ -36,7 +36,12 @@ function RequestLicense {
                "
 
 	token=$(eval "$request")
-
+ 
+	if [ "$?" -ne 0 ]; then
+		echo "Request license fail."
+		exit 1
+	fi
+ 
 	if [ -e "$token" ]; then
 	    echo "This token $1 was invalid."
 	    exit 1
