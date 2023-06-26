@@ -30,21 +30,28 @@ function CheckCmd {
 
 function RequestLicense {
 
-  local request="curl -X 'GET' \
-               'https://hra2-api-dev.hylink.io/sdk_license?user_id=$1' \
-               -H 'accept: application/json'
-               "
+	response=$(curl -X 'GET' \
+               		"https://hra2-api-dev.hylink.io/sdk_license?user_id=$1" \
+                	-H 'accept: application/json' \
+	        	-w "\n%{http_code}"
+		)
 
-	token=$(eval "$request")
- 
 	if [ "$?" -ne 0 ]; then
 		echo "Request license fail."
-		exit 1
+		return 1
 	fi
- 
-	if [ -e "$token" ]; then
+
+	http_code=$(echo "$response" | tail -n 1)
+
+	if [ "$http_code" -ne 200 ]; then
+		return 1
+	fi
+
+	token=$(echo "$response" | sed '$d')
+
+	if [ -z "$token" ]; then
 	    echo "This token $1 was invalid."
-	    exit 1
+	    return 1
 	fi
 
 	echo "$token"
@@ -64,7 +71,7 @@ echo "=========== license request start. =========="
 
 userToken=$HYENA_TOKEN
 
-if [ -z "$userToken" ] ; then 
+if [ -z "$userToken" ] ; then
 	echo "Please entry your token."
 	exit 1
 fi
@@ -75,7 +82,11 @@ CheckCmd
 
 getLicense=$(RequestLicense "$userToken")
 
+if [ "$?" -ne 0 ]; then
+	echo "Request license fail."
+	exit 1
+fi
+
 CreateFile
 
 echo "=========== license request finish. =========="
-
