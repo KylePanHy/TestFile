@@ -6,6 +6,8 @@ targetPath="${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/${targetFile}"
 
 getLicense=""
 
+exec 3>&1
+
 function CheckXcodeEnv {
 
   if [ -z "$BUILT_PRODUCTS_DIR" ] ; then
@@ -37,20 +39,21 @@ function RequestLicense {
 		)
 
 	if [ "$?" -ne 0 ]; then
-		echo "Request license fail."
+		echo "Curl request license fail.">&3
 		return 1
 	fi
 
 	http_code=$(echo "$response" | tail -n 1)
 
 	if [ "$http_code" -ne 200 ]; then
+		echo "Http request license failure, httpcode=($http_code)">&3
 		return 1
 	fi
 
 	token=$(echo "$response" | sed '$d')
 
 	if [ -z "$token" ]; then
-	    echo "This token $1 was invalid."
+	    echo "This token $1 was invalid.">&3
 	    return 1
 	fi
 
